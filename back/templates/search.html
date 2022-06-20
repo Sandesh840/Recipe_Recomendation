@@ -1,0 +1,23 @@
+{%extends 'header.html'%}
+{% block content %}
+<div class="page">
+    <div class="row">
+        {% for c in context%}
+        <div class="col-md-3">
+             <a href="/recipe/{{c.id}}" >
+            <div class="card">
+
+                <img src="{{c.image.url}}" alt="">
+                <h5>{{c.name}}</h5>
+                <p>Time {{c.time}}</p>
+            </div>
+             </a>
+
+        </div>
+{%endfor%}
+    </div>
+</div>
+
+{% endblock %}
+
+#/recipe/{{c.id}}
