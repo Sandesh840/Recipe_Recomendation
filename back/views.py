@@ -1,11 +1,16 @@
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
-from django.http import  HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
+
+from back.form import UploadFrom
+from back.ml import get_recommendation_recipes
 from back.models import Product, Category, Customer, Contact
+
+
 def index(request):
-    product =  Product.objects.all()
+    product = Product.objects.all()[:12]
     category = Category.objects.all()
     context = {
         'index': product,
@@ -28,9 +33,21 @@ def about(request):
     return render(request, 'about.html')
 
 
+# def dbrecipes(request):
+#     category = Category.objects.all()
+#     product = Product.objects.all()
+#     context = {
+#         'cat': category,
+#         'index': product,
+#     }
+#     return render(request, 'recipesAfter.html', context)
+
+
+
 def recipes(request):
     category = Category.objects.all()
-    product = Product.objects.all()
+
+    product = Product.objects.all()[:50]
     context = {
         'cat': category,
         'index': product,
@@ -38,16 +55,21 @@ def recipes(request):
     return render(request, 'recipes.html', context)
 
 
-def recipe(request,id):
-    category = Category.objects.all()
-    prod = Product.objects.filter(id=id).first()
-    print(prod)
+def recipe(request, id):
+    print("HELLo WORLD")
+    # category = Category.objects.all()
+    prod = Product.objects.get(id=id)
+    recipe_id =get_recommendation_recipes(id)
+    recommended_recipes = Product.objects.filter(id__in=recipe_id)
+    # prod = Product.objects.filter(id=id).first()
+    # product = prod.category.all().value_list('name', flat=True)
     # product=prod.Category.all()
     # print(product)
     context = {
-        'cat': category,
+        # 'cat': category,
         'prod': prod,
-        # 'product': product
+        'recommended_recipes':recommended_recipes,
+        # 'product': product,
     }
     return render(request, 'recipe.html', context)
 
@@ -197,6 +219,13 @@ class login(View):
                     print()
                     request.session['user'] = customer.first_name
                     login.return_url = None
+                    product = Product.objects.all()
+                    category = Category.objects.all()
+                    context = {
+                        'index': product,
+                        'cat': category,
+                    }
+                    # return render(request, 'index.html', context)
                     return redirect('/')
 
             else:
@@ -224,3 +253,41 @@ def search(request):
     return render(request,'search.html',{'context': context})
 
 
+def autosuggest(request):
+    query_original = request.GET.get('term')
+    queryset = Product.objects.filter(name__icontains = query_original)
+    mylist = []
+    mylist += [x.name for x in queryset]
+    return JsonResponse(mylist, safe=False)
+
+
+import pandas as pd
+from django.db import transaction
+
+def upload_dataset(request):
+    file_form = UploadFrom()
+    error_message ={}
+
+    if request.method == "POST":
+        file_form = UploadFrom(request.POST,request.FILES)
+        try:
+            if file_form.is_valid():
+                dataset = pd.read_csv(request.FILES['file'])
+                new_recipe_list =[]
+                dataset['name'] = dataset['name'].fillna(0)
+                with transaction.atomic():
+                    for index, row in dataset.iterrows():
+                        movie = Product(
+                            name=row['name'],
+                            Ingredients=row['Ingredients'],
+                            Instructions=row['Instructions'],
+                            image=row['image'],
+
+                        )
+                        new_recipe_list.append(movie)
+                Product.objects.bulk_create(new_recipe_list)
+            return redirect('/dataset')
+        except Exception as e:
+            print(e)
+            error_message['error'] = e
+    return render(request,'upload_dataset.html',{'form':file_form,'error_message':error_message})

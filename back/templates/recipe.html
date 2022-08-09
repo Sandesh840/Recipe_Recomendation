@@ -1,12 +1,13 @@
 {%extends 'header.html'%}
 {% block content %}
+{% if request.session.user %}
   <body>
 
     <main class="page">
       <div class="recipe-page">
         <section class="recipe-hero">
           <img
-            src="{{ prod.image.url }}"
+            src="{{ prod.image }}"
             class="img recipe-hero-img"
           />
           <article class="recipe-info">
@@ -23,7 +24,11 @@
 
             </div>
             <p class="recipe-tags">
-              Tags : <a href="template">{{product}}</a>
+              Tags : <a href="template">
+              {% for x in product %}
+              {{x}}
+              {% endfor %}
+            </a>
 
             </p>
           </article>
@@ -32,54 +37,52 @@
         <section class="recipe-content">
           <article>
             <h4>instructions</h4>
-            <!-- single instruction -->
             <div class="single-instruction">
               <header>
-                <p>step 1</p>
+                <p>step </p>
                 <div></div>
               </header>
               <p>
-               ......................................................
+               {{prod.Instructions}}
               </p>
             </div>
-            <div class="single-instruction">
-              <header>
-                <p>step 2</p>
-                <div></div>
-              </header>
-              <p>
-               ......................................................
-              </p>
-            </div>
-            <div class="single-instruction">
-              <header>
-                <p>step 3</p>
-                <div></div>
-              </header>
-              <p>
-                ......................................................
-              </p>
-            </div>
+
           </article>
           <article class="second-column">
             <div>
               <h4>ingredients</h4>
-              <p class="single-ingredient">1 1/2 cups dry  mix</p>
-              <p class="single-ingredient">1/2 cup  seed meal</p>
-              <p class="single-ingredient">1 cup  milk</p>
-            </div>
-            <div>
-              <h4>tools</h4>
-              <p class="single-tool">Hand Blender</p>
-              <p class="single-tool">Large Heavy Pot With Lid</p>
-              <p class="single-tool">Measuring Spoons</p>
-              <p class="single-tool">Measuring Cups</p>
+              <hr>
+              <p class="single-ingredient">{{prod.Ingredients}}</p>
             </div>
           </article>
         </section>
+      </div>
+      <div class="container my-3">
+        <h1>Recommended Recipes</h1>
+        <hr>
+        <div class="row ">
+          {% for r  in recommended_recipes %}
+            <div class="col-md-3">
+              <a href="/recipe/{{r.id}}" class="recipe">
+            <div class="card" >
+                 <img src="{{ r.image}}" class="img recipe-img m-0" alt="" style="height:250px;"/>
+                  <div class="card-body p-0 m-0">
+                    <h5 class="card-title mx-2 py-3">{{ r.name }}</h5>
+                  </div>
+                </div>
+             </a>
+            </div>
+          {%endfor%}
+        </div>
       </div>
     </main>
 
     <script src="./js/app.js"></script>
   </body>
+{%else%}
+<div class="container">
+  <h1>OPPs ! you are not login. Click here to <a href="/login">Login</a>
+</h1>
+</div>
+{%endif%}
 {% endblock %}

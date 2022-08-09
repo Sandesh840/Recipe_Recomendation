@@ -3,11 +3,12 @@ from .category import Category
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=50)
-    time = models.IntegerField(default=0)
-    category = models.ManyToManyField(Category)
-    description = models.CharField(max_length=500, default='' , null=True , blank=True)
-    image = models.ImageField(upload_to='uploads/products/')
+    name = models.CharField(max_length=50, blank=True, null=True)
+    Ingredients = models.CharField(max_length=800, blank=True, null=True)
+    Instructions = models.CharField(max_length=800, blank=True, null=True)
+    time = models.IntegerField(default=70)
+    category = models.ManyToManyField(Category, blank=True, null=True)
+    image = models.ImageField(upload_to='uploads/products/',blank=True, null=True)
 
     @staticmethod
     def get_products_by_id(ids):

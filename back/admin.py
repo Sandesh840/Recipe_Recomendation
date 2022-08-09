@@ -6,6 +6,7 @@ from .models.contact import Contact
 
 class AdminProduct(admin.ModelAdmin):
     list_display = ['name','time']
+    search_fields = ['name']
 
 
 
