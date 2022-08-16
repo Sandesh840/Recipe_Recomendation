@@ -6,8 +6,9 @@ class Product(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     Ingredients = models.CharField(max_length=800, blank=True, null=True)
     Instructions = models.CharField(max_length=800, blank=True, null=True)
-    time = models.IntegerField(default=70)
-    category = models.ManyToManyField(Category, blank=True, null=True)
+    time = models.IntegerField(default=0)
+
+    category = models.ForeignKey(Category,on_delete=models.CASCADE, blank=True, null=True)
     image = models.ImageField(upload_to='uploads/products/',blank=True, null=True)
 
     @staticmethod

@@ -22,7 +22,7 @@
                     </ul>
 
                 </div>
-           {% for p in index %}
+           {% for p in product %}
           {% if request.session.user %}
          <div class="col-md-3 my-3">
              <a href="/recipe/{{p.id}}" class="recipe">

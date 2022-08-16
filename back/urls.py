@@ -22,4 +22,5 @@ urlpatterns = [
     path('search', views.search),
     path('autosuggest', views.autosuggest, name="autosuggest"),
     path('dataset/', views.upload_dataset),
+    path('get_by_category/<int:id>', views.get_by_category)
 ]

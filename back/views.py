@@ -14,9 +14,18 @@ def index(request):
     category = Category.objects.all()
     context = {
         'index': product,
-        'cat': category,
+        'category': category,
     }
     return render(request, 'index.html', context)
+
+def get_by_category(request,id):
+    product = Product.objects.filter(category=id)
+    category = Category.objects.all()
+    context = {
+        'product': product,
+        'category': category,
+    }
+    return render(request,'get_by_category.html',context)
 
 def home(request):
     product = Product.objects.all()
@@ -249,7 +258,7 @@ def logout(request):
 # @login_required
 def search(request):
     data = request.POST.get('search')
-    context = Product.objects.filter(Q(name__icontains=data) | Q(description__icontains=data) | Q(time__icontains=data))
+    context = Product.objects.filter(Q(name__icontains=data))
     return render(request,'search.html',{'context': context})
 
 
@@ -282,6 +291,8 @@ def upload_dataset(request):
                             Ingredients=row['Ingredients'],
                             Instructions=row['Instructions'],
                             image=row['image'],
+                            time=row['time'],
+                            category= Category.objects.get(id=row['category'])
 
                         )
                         new_recipe_list.append(movie)
